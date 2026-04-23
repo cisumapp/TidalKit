@@ -23,7 +23,7 @@ public struct MonochromeConfiguration: Sendable {
     public var keychainService: String
 
     public init(
-        defaultAPIBaseURL: URL = URL(string: "https://api.monochrome.tf")!,
+        defaultAPIBaseURL: URL = URL(string: "https://hifi.geeked.wtf")!,
         appwriteBaseURL: URL = URL(string: "https://auth.monochrome.tf/v1")!,
         appwriteProjectID: String = "auth-for-monochrome",
         pocketBaseBaseURL: URL = URL(string: "https://data.samidy.xyz")!,
@@ -38,13 +38,13 @@ public struct MonochromeConfiguration: Sendable {
             "https://hifi.geeked.wtf",
             "https://eu-central.monochrome.tf",
             "https://us-west.monochrome.tf",
-            "https://api.monochrome.tf",
+            // "https://api.monochrome.tf",
             "https://monochrome-api.samidy.com",
             "https://maus.qqdl.site",
             "https://vogel.qqdl.site",
             "https://katze.qqdl.site",
             "https://hund.qqdl.site",
-            "https://tidal.kinoplus.online",
+            // "https://tidal.kinoplus.online",
             "https://wolf.qqdl.site",
         ],
         fallbackStreamingInstances: [String] = [
@@ -58,8 +58,8 @@ public struct MonochromeConfiguration: Sendable {
         instanceCacheDuration: TimeInterval = 15 * 60,
         cacheMaxAge: TimeInterval = 24 * 3600,
         cacheMaxSizeMB: Int = 200,
-        requestTimeout: TimeInterval = 30,
-        maxRequestAttempts: Int = 3,
+        requestTimeout: TimeInterval = 10,
+        maxRequestAttempts: Int = 1,
         keychainService: String = "com.tidalkit.monochrome.security"
     ) {
         self.defaultAPIBaseURL = defaultAPIBaseURL
