@@ -25,6 +25,9 @@ public actor MonochromeNetworkClient {
 
         while attempt < maxAttempts {
             attempt += 1
+            if let url = request.url {
+                TidalDebugLogger.log("Sending request to \(url.path) (attempt \(attempt))")
+            }
             do {
                 let (data, response) = try await session.data(for: request)
                 guard let http = response as? HTTPURLResponse else {
@@ -34,9 +37,11 @@ public actor MonochromeNetworkClient {
 
                 guard expectedStatusCodes.contains(http.statusCode) else {
                     let body = String(data: data, encoding: .utf8)
+                    TidalDebugLogger.log("Request failed with status \(http.statusCode)")
                     let serverError = MonochromeError.server(statusCode: http.statusCode, body: body)
 
                     if attempt < maxAttempts, isRetryableStatus(http.statusCode) {
+                        TidalDebugLogger.log("Retrying after backoff...")
                         try await backoff(attempt: attempt)
                         lastError = serverError
                         continue
@@ -45,18 +50,23 @@ public actor MonochromeNetworkClient {
                     throw serverError
                 }
 
+                TidalDebugLogger.log("Request succeeded (\(data.count) bytes)")
                 return data
             } catch let error as URLError {
+                TidalDebugLogger.log("Network error (URLError): \(error.localizedDescription)")
                 let mapped = MonochromeError.from(error)
                 if attempt < maxAttempts, isRetryableNetworkError(error) {
+                    TidalDebugLogger.log("Retrying network error after backoff...")
                     try await backoff(attempt: attempt)
                     lastError = mapped
                     continue
                 }
                 throw mapped
             } catch let error as MonochromeError {
+                TidalDebugLogger.log("Monochrome error: \(error.localizedDescription)")
                 throw error
             } catch {
+                TidalDebugLogger.log("Generic error: \(error.localizedDescription)")
                 throw MonochromeError.network(code: -1, message: error.localizedDescription)
             }
         }
